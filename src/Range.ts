@@ -1,4 +1,4 @@
-import { type Ratio } from 'rational';
+import { ratio, type Ratio } from 'rational';
 
 class Range {
   /**
@@ -60,6 +60,19 @@ class Range {
    */
   public static leftHalfOpen(left: Ratio, right: Ratio): Range {
     return new Range(left, right, false, true);
+  }
+
+  /**
+   * 空の区間を表します。
+   */
+  public static readonly empty = Range.open(ratio(0), ratio(0));
+
+  /**
+   * 指定した一点のみを含む区間を作成します。
+   * @param point 区間に含む点
+   */
+  public static point(point: Ratio): Range {
+    return Range.closed(point, point);
   }
 
   /**

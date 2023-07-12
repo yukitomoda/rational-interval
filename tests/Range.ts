@@ -43,6 +43,18 @@ describe('ctor', () => {
     assert.isTrue(range.includesLeft);
     assert.isFalse(range.includesRight);
   });
+
+  it('empty', () => {
+    assert.isTrue(Range.empty.empty);
+  });
+
+  it('point', () => {
+    const range = Range.point(ratio(1, 2));
+    assert.isTrue(range.left.eq(ratio(1, 2)));
+    assert.isTrue(range.right.eq(ratio(1, 2)));
+    assert.isTrue(range.includesLeft);
+    assert.isTrue(range.includesRight);
+  });
 });
 
 describe('accessors', () => {
