@@ -18,7 +18,7 @@ class Range {
   /**
    * この区間が空かどうかを取得します。
    */
-  public get empty(): boolean {
+  public get isEmpty(): boolean {
     if (this.includesLeft && this.includesRight) {
       return this.right.lt(this.left);
     } else {
@@ -81,7 +81,7 @@ class Range {
    * @param rhs 比較する区間
    */
   public eq(rhs: Range): boolean {
-    if (this.empty) return rhs.empty;
+    if (this.isEmpty) return rhs.isEmpty;
     return (
       this.includesLeft === rhs.includesLeft &&
       this.includesRight === rhs.includesRight &&
