@@ -44,3 +44,43 @@ describe('ctor', () => {
     assert.isFalse(range.includesRight);
   });
 });
+
+describe('accessors', () => {
+  describe('empty', () => {
+    it('closed', () => {
+      assert.isTrue(Range.closed(ratio(1, 2), ratio(0)).empty);
+      assert.isTrue(Range.closed(ratio(0), ratio(-1, 2)).empty);
+
+      assert.isFalse(Range.closed(ratio(-1, 2), ratio(1, 2)).empty);
+      assert.isFalse(Range.closed(ratio(1, 2), ratio(1, 2)).empty);
+      assert.isFalse(Range.closed(ratio(-1, 2), ratio(-1, 2)).empty);
+    });
+
+    it('leftHalfOpen', () => {
+      assert.isTrue(Range.leftHalfOpen(ratio(1, 2), ratio(1, 2)).empty);
+      assert.isTrue(Range.leftHalfOpen(ratio(1, 2), ratio(0)).empty);
+      assert.isTrue(Range.leftHalfOpen(ratio(0), ratio(-1, 2)).empty);
+      assert.isTrue(Range.leftHalfOpen(ratio(-1, 2), ratio(-1, 2)).empty);
+
+      assert.isFalse(Range.leftHalfOpen(ratio(-1, 2), ratio(1, 2)).empty);
+    });
+
+    it('rightHalfOpen', () => {
+      assert.isTrue(Range.leftHalfOpen(ratio(1, 2), ratio(1, 2)).empty);
+      assert.isTrue(Range.leftHalfOpen(ratio(1, 2), ratio(0)).empty);
+      assert.isTrue(Range.leftHalfOpen(ratio(0), ratio(-1, 2)).empty);
+      assert.isTrue(Range.leftHalfOpen(ratio(-1, 2), ratio(-1, 2)).empty);
+
+      assert.isFalse(Range.leftHalfOpen(ratio(-1, 2), ratio(1, 2)).empty);
+    });
+
+    it('open', () => {
+      assert.isTrue(Range.leftHalfOpen(ratio(1, 2), ratio(1, 2)).empty);
+      assert.isTrue(Range.leftHalfOpen(ratio(1, 2), ratio(0)).empty);
+      assert.isTrue(Range.leftHalfOpen(ratio(0), ratio(-1, 2)).empty);
+      assert.isTrue(Range.leftHalfOpen(ratio(-1, 2), ratio(-1, 2)).empty);
+
+      assert.isFalse(Range.leftHalfOpen(ratio(-1, 2), ratio(1, 2)).empty);
+    });
+  });
+});

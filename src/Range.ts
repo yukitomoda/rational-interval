@@ -16,6 +16,17 @@ class Range {
   ) {}
 
   /**
+   * この区間が空かどうかを取得します。
+   */
+  public get empty(): boolean {
+    if (this.includesLeft && this.includesRight) {
+      return this.right.lt(this.left);
+    } else {
+      return this.right.leq(this.left);
+    }
+  }
+
+  /**
    * 閉区間を作成します。
    * @param left 区間の始点
    * @param right 区間の終点
