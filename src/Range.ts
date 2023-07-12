@@ -61,6 +61,21 @@ class Range {
   public static leftHalfOpen(left: Ratio, right: Ratio): Range {
     return new Range(left, right, false, true);
   }
+
+  /**
+   * 指定した区間がこの区間と等しいかどうかを調べます。
+   *
+   * @param rhs 比較する区間
+   */
+  public eq(rhs: Range): boolean {
+    if (this.empty) return rhs.empty;
+    return (
+      this.includesLeft === rhs.includesLeft &&
+      this.includesRight === rhs.includesRight &&
+      this.left.eq(rhs.left) &&
+      this.right.eq(rhs.right)
+    );
+  }
 }
 
 export { Range };

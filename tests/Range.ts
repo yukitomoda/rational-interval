@@ -84,3 +84,32 @@ describe('accessors', () => {
     });
   });
 });
+
+describe('comparison', () => {
+  it('eq', () => {
+    assert.isTrue(Range.closed(ratio(1), ratio(1)).eq(Range.closed(ratio(1), ratio(1))));
+    assert.isTrue(Range.closed(ratio(-1), ratio(1)).eq(Range.closed(ratio(-1), ratio(1))));
+    assert.isTrue(Range.leftHalfOpen(ratio(-1), ratio(1)).eq(Range.leftHalfOpen(ratio(-1), ratio(1))));
+    assert.isTrue(Range.rightHalfOpen(ratio(-1), ratio(1)).eq(Range.rightHalfOpen(ratio(-1), ratio(1))));
+    assert.isTrue(Range.open(ratio(-1), ratio(1)).eq(Range.open(ratio(-1), ratio(1))));
+    assert.isTrue(Range.closed(ratio(1), ratio(-1)).eq(Range.closed(ratio(2), ratio(-2))));
+    assert.isTrue(Range.open(ratio(1), ratio(1)).eq(Range.open(ratio(2), ratio(2))));
+
+    assert.isFalse(Range.closed(ratio(-1), ratio(1)).eq(Range.closed(ratio(-1), ratio(2))));
+    assert.isFalse(Range.closed(ratio(-1), ratio(1)).eq(Range.closed(ratio(-2), ratio(1))));
+    assert.isFalse(Range.closed(ratio(-1), ratio(1)).eq(Range.closed(ratio(1), ratio(-1))));
+
+    assert.isFalse(Range.closed(ratio(-1), ratio(1)).eq(Range.leftHalfOpen(ratio(-1), ratio(1))));
+    assert.isFalse(Range.closed(ratio(-1), ratio(1)).eq(Range.rightHalfOpen(ratio(-1), ratio(1))));
+    assert.isFalse(Range.closed(ratio(-1), ratio(1)).eq(Range.open(ratio(-1), ratio(1))));
+    assert.isFalse(Range.leftHalfOpen(ratio(-1), ratio(1)).eq(Range.closed(ratio(-1), ratio(1))));
+    assert.isFalse(Range.leftHalfOpen(ratio(-1), ratio(1)).eq(Range.rightHalfOpen(ratio(-1), ratio(1))));
+    assert.isFalse(Range.leftHalfOpen(ratio(-1), ratio(1)).eq(Range.open(ratio(-1), ratio(1))));
+    assert.isFalse(Range.rightHalfOpen(ratio(-1), ratio(1)).eq(Range.closed(ratio(-1), ratio(1))));
+    assert.isFalse(Range.rightHalfOpen(ratio(-1), ratio(1)).eq(Range.leftHalfOpen(ratio(-1), ratio(1))));
+    assert.isFalse(Range.rightHalfOpen(ratio(-1), ratio(1)).eq(Range.open(ratio(-1), ratio(1))));
+    assert.isFalse(Range.open(ratio(-1), ratio(1)).eq(Range.closed(ratio(-1), ratio(1))));
+    assert.isFalse(Range.open(ratio(-1), ratio(1)).eq(Range.leftHalfOpen(ratio(-1), ratio(1))));
+    assert.isFalse(Range.open(ratio(-1), ratio(1)).eq(Range.rightHalfOpen(ratio(-1), ratio(1))));
+  });
+});
