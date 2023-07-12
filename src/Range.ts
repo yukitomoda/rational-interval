@@ -1,4 +1,4 @@
-import { type ConvertableToRatio, ratio, Ratio } from 'rational';
+import { type ConvertableToRatio, Ratio } from 'rational';
 
 class Range {
   /**
@@ -31,8 +31,8 @@ class Range {
    * @param left 区間の始点
    * @param right 区間の終点
    */
-  public static closed(left: Ratio, right: Ratio): Range {
-    return new Range(left, right);
+  public static closed(left: ConvertableToRatio, right: ConvertableToRatio): Range {
+    return new Range(Ratio.from(left), Ratio.from(right));
   }
 
   /**
@@ -40,8 +40,8 @@ class Range {
    * @param left 区間の始点
    * @param right 区間の終点
    */
-  public static open(left: Ratio, right: Ratio): Range {
-    return new Range(left, right, false, false);
+  public static open(left: ConvertableToRatio, right: ConvertableToRatio): Range {
+    return new Range(Ratio.from(left), Ratio.from(right), false, false);
   }
 
   /**
@@ -49,8 +49,8 @@ class Range {
    * @param left 区間の始点
    * @param right 区間の終点
    */
-  public static rightHalfOpen(left: Ratio, right: Ratio): Range {
-    return new Range(left, right, true, false);
+  public static rightHalfOpen(left: ConvertableToRatio, right: ConvertableToRatio): Range {
+    return new Range(Ratio.from(left), Ratio.from(right), true, false);
   }
 
   /**
@@ -58,21 +58,22 @@ class Range {
    * @param left 区間の始点
    * @param right 区間の終点
    */
-  public static leftHalfOpen(left: Ratio, right: Ratio): Range {
-    return new Range(left, right, false, true);
+  public static leftHalfOpen(left: ConvertableToRatio, right: ConvertableToRatio): Range {
+    return new Range(Ratio.from(left), Ratio.from(right), false, true);
   }
 
   /**
    * 空の区間を表します。
    */
-  public static readonly empty = Range.open(ratio(0), ratio(0));
+  public static readonly empty = Range.open(0, 0);
 
   /**
    * 指定した一点のみを含む区間を作成します。
    * @param point 区間に含む点
    */
-  public static point(point: Ratio): Range {
-    return Range.closed(point, point);
+  public static point(point: ConvertableToRatio): Range {
+    point = Ratio.from(point);
+    return new Range(point, point, true, true);
   }
 
   /**
