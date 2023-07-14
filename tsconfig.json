@@ -9,6 +9,7 @@
     "useDefineForClassFields": true,
     "sourceMap": true,
     "declaration": true,
+    "moduleResolution": "NodeNext",
     "baseUrl": ".",
     "rootDir": "./src",
     "paths": {},
