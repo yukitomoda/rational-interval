@@ -1,6 +1,6 @@
 import { type ConvertableToRatio, Ratio } from 'rational';
 
-class Range {
+class Interval {
   /**
    * 指定した始点、終点で区間を作成します。
    * @param left 区間の始点
@@ -31,8 +31,8 @@ class Range {
    * @param left 区間の始点
    * @param right 区間の終点
    */
-  public static closed(left: ConvertableToRatio, right: ConvertableToRatio): Range {
-    return new Range(Ratio.from(left), Ratio.from(right));
+  public static closed(left: ConvertableToRatio, right: ConvertableToRatio): Interval {
+    return new Interval(Ratio.from(left), Ratio.from(right));
   }
 
   /**
@@ -40,8 +40,8 @@ class Range {
    * @param left 区間の始点
    * @param right 区間の終点
    */
-  public static open(left: ConvertableToRatio, right: ConvertableToRatio): Range {
-    return new Range(Ratio.from(left), Ratio.from(right), false, false);
+  public static open(left: ConvertableToRatio, right: ConvertableToRatio): Interval {
+    return new Interval(Ratio.from(left), Ratio.from(right), false, false);
   }
 
   /**
@@ -49,8 +49,8 @@ class Range {
    * @param left 区間の始点
    * @param right 区間の終点
    */
-  public static rightHalfOpen(left: ConvertableToRatio, right: ConvertableToRatio): Range {
-    return new Range(Ratio.from(left), Ratio.from(right), true, false);
+  public static rightHalfOpen(left: ConvertableToRatio, right: ConvertableToRatio): Interval {
+    return new Interval(Ratio.from(left), Ratio.from(right), true, false);
   }
 
   /**
@@ -58,22 +58,22 @@ class Range {
    * @param left 区間の始点
    * @param right 区間の終点
    */
-  public static leftHalfOpen(left: ConvertableToRatio, right: ConvertableToRatio): Range {
-    return new Range(Ratio.from(left), Ratio.from(right), false, true);
+  public static leftHalfOpen(left: ConvertableToRatio, right: ConvertableToRatio): Interval {
+    return new Interval(Ratio.from(left), Ratio.from(right), false, true);
   }
 
   /**
    * 空の区間を表します。
    */
-  public static readonly empty = Range.open(0, 0);
+  public static readonly empty = Interval.open(0, 0);
 
   /**
    * 指定した一点のみを含む区間を作成します。
    * @param point 区間に含む点
    */
-  public static point(point: ConvertableToRatio): Range {
+  public static point(point: ConvertableToRatio): Interval {
     point = Ratio.from(point);
-    return new Range(point, point, true, true);
+    return new Interval(point, point, true, true);
   }
 
   /**
@@ -81,7 +81,7 @@ class Range {
    *
    * @param rhs 比較する区間
    */
-  public eq(rhs: Range): boolean {
+  public eq(rhs: Interval): boolean {
     if (this.isEmpty) return rhs.isEmpty;
     return (
       this.includesLeft === rhs.includesLeft &&
@@ -121,8 +121,8 @@ class Range {
    * この区間が指定した値または区間のすべてを含むかどうかを調べます。
    * @param rhs 調べる値または範囲。
    */
-  public contains(rhs: Range | ConvertableToRatio): boolean {
-    if (rhs instanceof Range) {
+  public contains(rhs: Interval | ConvertableToRatio): boolean {
+    if (rhs instanceof Interval) {
       if (rhs.isEmpty) return true;
       if (this.isEmpty) return false;
       return this.leftContains(rhs.left, rhs.includesLeft) && this.rightContains(rhs.right, rhs.includesRight);
@@ -135,4 +135,4 @@ class Range {
   }
 }
 
-export { Range };
+export { Interval };
