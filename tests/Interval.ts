@@ -209,3 +209,42 @@ describe('comparison', () => {
     });
   });
 });
+
+describe('arithmetic', () => {
+  describe('add', () => {
+    it('Interval', () => {
+      assert.isTrue(Interval.closed(-1, 2).add(Interval.closed(-3, 4)).eq(Interval.closed(-4, 6)));
+      assert.isTrue(Interval.closed(-1, 2).add(Interval.leftHalfOpen(-3, 4)).eq(Interval.leftHalfOpen(-4, 6)));
+      assert.isTrue(Interval.closed(-1, 2).add(Interval.rightHalfOpen(-3, 4)).eq(Interval.rightHalfOpen(-4, 6)));
+      assert.isTrue(Interval.closed(-1, 2).add(Interval.open(-3, 4)).eq(Interval.open(-4, 6)));
+
+      assert.isTrue(Interval.leftHalfOpen(-1, 2).add(Interval.closed(-3, 4)).eq(Interval.leftHalfOpen(-4, 6)));
+      assert.isTrue(Interval.leftHalfOpen(-1, 2).add(Interval.leftHalfOpen(-3, 4)).eq(Interval.leftHalfOpen(-4, 6)));
+      assert.isTrue(Interval.leftHalfOpen(-1, 2).add(Interval.rightHalfOpen(-3, 4)).eq(Interval.open(-4, 6)));
+      assert.isTrue(Interval.leftHalfOpen(-1, 2).add(Interval.open(-3, 4)).eq(Interval.open(-4, 6)));
+
+      assert.isTrue(Interval.rightHalfOpen(-1, 2).add(Interval.closed(-3, 4)).eq(Interval.rightHalfOpen(-4, 6)));
+      assert.isTrue(Interval.rightHalfOpen(-1, 2).add(Interval.leftHalfOpen(-3, 4)).eq(Interval.open(-4, 6)));
+      assert.isTrue(Interval.rightHalfOpen(-1, 2).add(Interval.rightHalfOpen(-3, 4)).eq(Interval.rightHalfOpen(-4, 6)));
+      assert.isTrue(Interval.rightHalfOpen(-1, 2).add(Interval.open(-3, 4)).eq(Interval.open(-4, 6)));
+
+      assert.isTrue(Interval.rightHalfOpen(-1, 2).add(Interval.closed(-3, 4)).eq(Interval.rightHalfOpen(-4, 6)));
+      assert.isTrue(Interval.rightHalfOpen(-1, 2).add(Interval.leftHalfOpen(-3, 4)).eq(Interval.open(-4, 6)));
+      assert.isTrue(Interval.rightHalfOpen(-1, 2).add(Interval.rightHalfOpen(-3, 4)).eq(Interval.rightHalfOpen(-4, 6)));
+      assert.isTrue(Interval.rightHalfOpen(-1, 2).add(Interval.open(-3, 4)).eq(Interval.open(-4, 6)));
+    });
+
+    it('ratio', () => {
+      assert.isTrue(Interval.closed(-1, 2).add(ratio(3)).eq(Interval.closed(2, 5)));
+      assert.isTrue(Interval.leftHalfOpen(-1, 2).add(ratio(3)).eq(Interval.leftHalfOpen(2, 5)));
+      assert.isTrue(Interval.rightHalfOpen(-1, 2).add(ratio(3)).eq(Interval.rightHalfOpen(2, 5)));
+      assert.isTrue(Interval.open(-1, 2).add(ratio(3)).eq(Interval.open(2, 5)));
+    });
+
+    it('empty Interval', () => {
+      assert.isTrue(Interval.empty.add(Interval.closed(-3, 4)).eq(Interval.empty));
+      assert.isTrue(Interval.closed(-1, 2).add(Interval.empty).eq(Interval.empty));
+      assert.isTrue(Interval.empty.add(ratio(3)).eq(Interval.empty));
+    });
+  });
+});
