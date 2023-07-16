@@ -133,6 +133,25 @@ class Interval {
       return this.leftContains(rhs) && this.rightContains(rhs);
     }
   }
+
+  private changeBoundary(left: Ratio, right: Ratio): Interval {
+    return new Interval(left, right, this.includesLeft, this.includesRight);
+  }
+
+  public add(rhs: Interval | ConvertableToRatio): Interval {
+    if (this.isEmpty) return this;
+    if (rhs instanceof Interval) {
+      if (rhs.isEmpty) return rhs;
+      return new Interval(
+        this.left.add(rhs.left),
+        this.right.add(rhs.right),
+        this.includesLeft && rhs.includesLeft,
+        this.includesRight && rhs.includesRight
+      );
+    } else {
+      return this.changeBoundary(this.left.add(rhs), this.right.add(rhs));
+    }
+  }
 }
 
 export { Interval };
