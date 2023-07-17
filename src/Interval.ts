@@ -165,6 +165,10 @@ class Interval {
     }
   }
 
+  /**
+   * この区間から指定した値または区間を減算します。
+   * @param rhs 減算する値または区間
+   */
   public sub(rhs: Interval | ConvertableToRatio): Interval {
     if (rhs instanceof Interval) {
       return this.add(rhs.neg());
