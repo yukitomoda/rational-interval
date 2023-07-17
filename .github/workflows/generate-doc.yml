@@ -18,8 +18,8 @@ jobs:
       - run: npm run doc
       - name: git setting
         run: |
-          git config --local user.email ${{ vars.GIT_USER_EMAIL }}
-          git config --local user.name ${{ vars.GIT_USER_NAME }}
+          git config --local user.email ${{ vars.DOC_AUTO_GENERATOR_GIT_USER_EMAIL }}
+          git config --local user.name ${{ vars.DOC_AUTO_GENERATOR_GIT_USER_NAME }}
       - name: Commit files
         run: |
           git add .
