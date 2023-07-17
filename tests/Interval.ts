@@ -211,6 +211,15 @@ describe('comparison', () => {
 });
 
 describe('arithmetic', () => {
+  it('neg', () => {
+    assert.isTrue(Interval.closed(-1, 2).neg().eq(Interval.closed(-2, 1)));
+    assert.isTrue(Interval.leftHalfOpen(-1, 2).neg().eq(Interval.rightHalfOpen(-2, 1)));
+    assert.isTrue(Interval.rightHalfOpen(-1, 2).neg().eq(Interval.leftHalfOpen(-2, 1)));
+    assert.isTrue(Interval.open(-1, 2).neg().eq(Interval.open(-2, 1)));
+    assert.isTrue(Interval.point(2).neg().eq(Interval.point(-2)));
+    assert.isTrue(Interval.empty.neg().eq(Interval.empty));
+  });
+
   describe('add', () => {
     it('Interval', () => {
       assert.isTrue(Interval.closed(-1, 2).add(Interval.closed(-3, 4)).eq(Interval.closed(-4, 6)));
