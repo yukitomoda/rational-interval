@@ -138,6 +138,10 @@ class Interval {
     return new Interval(left, right, this.includesLeft, this.includesRight);
   }
 
+  /**
+   * この区間に指定した値または区間を加算します。
+   * @param rhs 加算する値または区間
+   */
   public add(rhs: Interval | ConvertableToRatio): Interval {
     if (this.isEmpty) return this;
     if (rhs instanceof Interval) {
