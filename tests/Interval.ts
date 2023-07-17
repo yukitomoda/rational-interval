@@ -14,6 +14,14 @@ describe('ctor', () => {
     assert.isTrue(interval.includesRight);
   });
 
+  it('throws if radius is negative', () => {
+    assert.throws(() => new Interval(ratio(0), ratio(-1)));
+    assert.throws(() => Interval.closed(ratio(1, 2), ratio(0)));
+    assert.throws(() => Interval.leftHalfOpen(ratio(1, 2), ratio(0)));
+    assert.throws(() => Interval.rightHalfOpen(ratio(1, 2), ratio(0)));
+    assert.throws(() => Interval.open(ratio(1, 2), ratio(0)));
+  });
+
   it('fromBoundary', () => {
     const interval = Interval.fromBoundary(ratio(1, 2), ratio(3, 4));
     assert.isTrue(interval.left.eq(ratio(1, 2)));
@@ -70,9 +78,6 @@ describe('ctor', () => {
 describe('accessors', () => {
   describe('empty', () => {
     it('closed', () => {
-      assert.isTrue(Interval.closed(ratio(1, 2), ratio(0)).isEmpty);
-      assert.isTrue(Interval.closed(ratio(0), ratio(-1, 2)).isEmpty);
-
       assert.isFalse(Interval.closed(ratio(-1, 2), ratio(1, 2)).isEmpty);
       assert.isFalse(Interval.closed(ratio(1, 2), ratio(1, 2)).isEmpty);
       assert.isFalse(Interval.closed(ratio(-1, 2), ratio(-1, 2)).isEmpty);
@@ -80,8 +85,6 @@ describe('accessors', () => {
 
     it('leftHalfOpen', () => {
       assert.isTrue(Interval.leftHalfOpen(ratio(1, 2), ratio(1, 2)).isEmpty);
-      assert.isTrue(Interval.leftHalfOpen(ratio(1, 2), ratio(0)).isEmpty);
-      assert.isTrue(Interval.leftHalfOpen(ratio(0), ratio(-1, 2)).isEmpty);
       assert.isTrue(Interval.leftHalfOpen(ratio(-1, 2), ratio(-1, 2)).isEmpty);
 
       assert.isFalse(Interval.leftHalfOpen(ratio(-1, 2), ratio(1, 2)).isEmpty);
@@ -89,8 +92,6 @@ describe('accessors', () => {
 
     it('rightHalfOpen', () => {
       assert.isTrue(Interval.leftHalfOpen(ratio(1, 2), ratio(1, 2)).isEmpty);
-      assert.isTrue(Interval.leftHalfOpen(ratio(1, 2), ratio(0)).isEmpty);
-      assert.isTrue(Interval.leftHalfOpen(ratio(0), ratio(-1, 2)).isEmpty);
       assert.isTrue(Interval.leftHalfOpen(ratio(-1, 2), ratio(-1, 2)).isEmpty);
 
       assert.isFalse(Interval.leftHalfOpen(ratio(-1, 2), ratio(1, 2)).isEmpty);
@@ -98,8 +99,6 @@ describe('accessors', () => {
 
     it('open', () => {
       assert.isTrue(Interval.leftHalfOpen(ratio(1, 2), ratio(1, 2)).isEmpty);
-      assert.isTrue(Interval.leftHalfOpen(ratio(1, 2), ratio(0)).isEmpty);
-      assert.isTrue(Interval.leftHalfOpen(ratio(0), ratio(-1, 2)).isEmpty);
       assert.isTrue(Interval.leftHalfOpen(ratio(-1, 2), ratio(-1, 2)).isEmpty);
 
       assert.isFalse(Interval.leftHalfOpen(ratio(-1, 2), ratio(1, 2)).isEmpty);
@@ -114,12 +113,10 @@ describe('comparison', () => {
     assert.isTrue(Interval.leftHalfOpen(ratio(-1), ratio(1)).eq(Interval.leftHalfOpen(ratio(-1), ratio(1))));
     assert.isTrue(Interval.rightHalfOpen(ratio(-1), ratio(1)).eq(Interval.rightHalfOpen(ratio(-1), ratio(1))));
     assert.isTrue(Interval.open(ratio(-1), ratio(1)).eq(Interval.open(ratio(-1), ratio(1))));
-    assert.isTrue(Interval.closed(ratio(1), ratio(-1)).eq(Interval.closed(ratio(2), ratio(-2))));
     assert.isTrue(Interval.open(ratio(1), ratio(1)).eq(Interval.open(ratio(2), ratio(2))));
 
     assert.isFalse(Interval.closed(ratio(-1), ratio(1)).eq(Interval.closed(ratio(-1), ratio(2))));
     assert.isFalse(Interval.closed(ratio(-1), ratio(1)).eq(Interval.closed(ratio(-2), ratio(1))));
-    assert.isFalse(Interval.closed(ratio(-1), ratio(1)).eq(Interval.closed(ratio(1), ratio(-1))));
 
     assert.isFalse(Interval.closed(ratio(-1), ratio(1)).eq(Interval.leftHalfOpen(ratio(-1), ratio(1))));
     assert.isFalse(Interval.closed(ratio(-1), ratio(1)).eq(Interval.rightHalfOpen(ratio(-1), ratio(1))));
