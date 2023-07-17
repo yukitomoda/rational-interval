@@ -1,4 +1,3 @@
-import { Logical3 } from './Logical3';
-import { type ConvertableToLogical3 } from './types';
+import { Interval } from './Interval';
 
-export { Logical3, type ConvertableToLogical3 };
+export { Interval };
