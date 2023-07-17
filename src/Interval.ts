@@ -147,6 +147,18 @@ class Interval {
   }
 
   /**
+   * この区間を逆数の区間に変換します。
+   *
+   * この関数を使用する場合、区間に0が（0が含まれない開区間である場合を含めて）含まれていてはなりません。
+   */
+  public inv(): Interval {
+    if (this.isEmpty) return this;
+    if (Interval.closed(this.left, this.right).contains(Ratio.from(0)))
+      throw new Error('Interval must not contain zero.');
+    return new Interval(this.right.inv(), this.left.inv(), this.includesRight, this.includesLeft);
+  }
+
+  /**
    * この区間に指定した値または区間を加算します。
    * @param rhs 加算する値または区間
    */
