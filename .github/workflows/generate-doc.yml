@@ -22,9 +22,9 @@ jobs:
           git config --local user.name "${{ vars.DOC_AUTO_GENERATOR_GIT_USER_NAME }}"
       - name: Commit files
         run: |
-          git add .
+          git add ./docs
           git commit -m "auto doc generation" -a
       - name: Push files
         run: |
           git pull
-          git push origin master
+          git push origin main
