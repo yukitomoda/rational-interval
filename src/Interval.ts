@@ -2,28 +2,64 @@ import { type ConvertableToRatio, Ratio } from 'rational';
 
 class Interval {
   /**
-   * 指定した始点、終点で区間を作成します。
-   * @param left 区間の始点
-   * @param right 区間の終点
+   * 指定した中心、半径で区間を作成します。
+   * @param center 区間中心
+   * @param radius 区間の半径
    * @param includesLeft 区間の始点を含めるかどうか。
    * @param includesRight 区間の終点を含めるかどうか。
    */
   public constructor(
-    public readonly left: Ratio,
-    public readonly right: Ratio,
+    public readonly center: Ratio,
+    public readonly radius: Ratio,
     public readonly includesLeft: boolean = true,
     public readonly includesRight: boolean = true
-  ) {}
+  ) {
+    if (radius.isNegative) throw new Error('radius must not be negative.');
+  }
 
   /**
    * この区間が空かどうかを取得します。
    */
   public get isEmpty(): boolean {
     if (this.includesLeft && this.includesRight) {
-      return this.right.lt(this.left);
+      return false;
     } else {
-      return this.right.leq(this.left);
+      return !this.radius.isPositive;
     }
+  }
+
+  /**
+   * この区間の左端を取得します。
+   */
+  public get left(): Ratio {
+    return this.center.sub(this.radius);
+  }
+
+  /**
+   * この区間の右端を取得します。
+   */
+  public get right(): Ratio {
+    return this.center.add(this.radius);
+  }
+
+  /**
+   * 区間の両端の値から、区間のインスタンスを作成します。
+   * @param left 区間の左端の点。
+   * @param right 区間の右端の点。
+   * @param includesLeft 区間の始点を含めるかどうか。
+   * @param includesRight 区間の終点を含めるかどうか。
+   */
+  public static fromBoundary(
+    left: ConvertableToRatio,
+    right: ConvertableToRatio,
+    includesLeft: boolean = true,
+    includesRight: boolean = true
+  ): Interval {
+    left = Ratio.from(left);
+    right = Ratio.from(right);
+    const center = left.add(right).div(2);
+    const radius = right.sub(left).div(2);
+    return new Interval(center, radius, includesLeft, includesRight);
   }
 
   /**
@@ -32,7 +68,7 @@ class Interval {
    * @param right 区間の終点
    */
   public static closed(left: ConvertableToRatio, right: ConvertableToRatio): Interval {
-    return new Interval(Ratio.from(left), Ratio.from(right));
+    return Interval.fromBoundary(left, right);
   }
 
   /**
@@ -41,7 +77,7 @@ class Interval {
    * @param right 区間の終点
    */
   public static open(left: ConvertableToRatio, right: ConvertableToRatio): Interval {
-    return new Interval(Ratio.from(left), Ratio.from(right), false, false);
+    return Interval.fromBoundary(left, right, false, false);
   }
 
   /**
@@ -50,7 +86,7 @@ class Interval {
    * @param right 区間の終点
    */
   public static rightHalfOpen(left: ConvertableToRatio, right: ConvertableToRatio): Interval {
-    return new Interval(Ratio.from(left), Ratio.from(right), true, false);
+    return Interval.fromBoundary(left, right, true, false);
   }
 
   /**
@@ -59,21 +95,20 @@ class Interval {
    * @param right 区間の終点
    */
   public static leftHalfOpen(left: ConvertableToRatio, right: ConvertableToRatio): Interval {
-    return new Interval(Ratio.from(left), Ratio.from(right), false, true);
+    return Interval.fromBoundary(left, right, false, true);
   }
 
   /**
    * 空の区間を表します。
    */
-  public static readonly empty = Interval.open(0, 0);
+  public static readonly empty = new Interval(Ratio.from(0), Ratio.from(0), false, false);
 
   /**
    * 指定した一点のみを含む区間を作成します。
    * @param point 区間に含む点
    */
   public static point(point: ConvertableToRatio): Interval {
-    point = Ratio.from(point);
-    return new Interval(point, point, true, true);
+    return new Interval(Ratio.from(point), Ratio.from(0), true, true);
   }
 
   /**
@@ -86,8 +121,8 @@ class Interval {
     return (
       this.includesLeft === rhs.includesLeft &&
       this.includesRight === rhs.includesRight &&
-      this.left.eq(rhs.left) &&
-      this.right.eq(rhs.right)
+      this.center.eq(rhs.center) &&
+      this.radius.eq(rhs.radius)
     );
   }
 
@@ -135,7 +170,7 @@ class Interval {
   }
 
   private changeBoundary(left: Ratio, right: Ratio): Interval {
-    return new Interval(left, right, this.includesLeft, this.includesRight);
+    return Interval.fromBoundary(left, right, this.includesLeft, this.includesRight);
   }
 
   /**
@@ -143,7 +178,7 @@ class Interval {
    */
   public neg(): Interval {
     if (this.isEmpty) return this;
-    return new Interval(this.right.neg(), this.left.neg(), this.includesRight, this.includesLeft);
+    return new Interval(this.center.neg(), this.radius, this.includesRight, this.includesLeft);
   }
 
   /**
@@ -153,9 +188,9 @@ class Interval {
    */
   public inv(): Interval {
     if (this.isEmpty) return this;
-    if (Interval.closed(this.left, this.right).contains(Ratio.from(0)))
+    if (new Interval(this.center, this.radius).contains(Ratio.from(0)))
       throw new Error('Interval must not contain zero.');
-    return new Interval(this.right.inv(), this.left.inv(), this.includesRight, this.includesLeft);
+    return Interval.fromBoundary(this.right.inv(), this.left.inv(), this.includesRight, this.includesLeft);
   }
 
   /**
@@ -167,13 +202,13 @@ class Interval {
     if (rhs instanceof Interval) {
       if (rhs.isEmpty) return rhs;
       return new Interval(
-        this.left.add(rhs.left),
-        this.right.add(rhs.right),
+        this.center.add(rhs.center),
+        this.radius.add(rhs.radius),
         this.includesLeft && rhs.includesLeft,
         this.includesRight && rhs.includesRight
       );
     } else {
-      return this.changeBoundary(this.left.add(rhs), this.right.add(rhs));
+      return new Interval(this.center.add(rhs), this.radius, this.includesLeft, this.includesRight);
     }
   }
 
