@@ -5,7 +5,17 @@ import { it, describe } from 'mocha';
 
 describe('ctor', () => {
   it('ctor', () => {
-    const interval = new Interval(ratio(1, 2), ratio(3, 4));
+    const interval = new Interval(ratio(1, 2), ratio(1, 4));
+    assert.isTrue(interval.center.eq(ratio(1, 2)));
+    assert.isTrue(interval.radius.eq(ratio(1, 4)));
+    assert.isTrue(interval.left.eq(ratio(1, 4)));
+    assert.isTrue(interval.right.eq(ratio(3, 4)));
+    assert.isTrue(interval.includesLeft);
+    assert.isTrue(interval.includesRight);
+  });
+
+  it('fromBoundary', () => {
+    const interval = Interval.fromBoundary(ratio(1, 2), ratio(3, 4));
     assert.isTrue(interval.left.eq(ratio(1, 2)));
     assert.isTrue(interval.right.eq(ratio(3, 4)));
     assert.isTrue(interval.includesLeft);

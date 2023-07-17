@@ -22,9 +22,9 @@ class Interval {
    */
   public get isEmpty(): boolean {
     if (this.includesLeft && this.includesRight) {
-      return true;
+      return false;
     } else {
-      return this.radius.isPositive;
+      return !this.radius.isPositive;
     }
   }
 
@@ -86,7 +86,7 @@ class Interval {
    * @param right 区間の終点
    */
   public static rightHalfOpen(left: ConvertableToRatio, right: ConvertableToRatio): Interval {
-    return Interval.fromBoundary(left, right, false, true);
+    return Interval.fromBoundary(left, right, true, false);
   }
 
   /**
@@ -95,7 +95,7 @@ class Interval {
    * @param right 区間の終点
    */
   public static leftHalfOpen(left: ConvertableToRatio, right: ConvertableToRatio): Interval {
-    return Interval.fromBoundary(left, right, true, false);
+    return Interval.fromBoundary(left, right, false, true);
   }
 
   /**
