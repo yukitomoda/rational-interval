@@ -223,6 +223,130 @@ class Interval {
       return this.add(Ratio.from(rhs).neg());
     }
   }
+
+  /**
+   * この区間に指定した値または区間を乗算します。
+   * @param rhs 乗算する値または区間
+   */
+  public mul(rhs: Interval | ConvertableToRatio): Interval {
+    if (this.isEmpty) return this;
+    if (rhs instanceof Interval) {
+      if (rhs.isEmpty) return rhs;
+      const a = this.left;
+      const b = this.right;
+      const c = rhs.left;
+      const d = rhs.right;
+
+      if (a.isPositive) {
+        if (c.isPositive) {
+          // 0 < a..b && 0 < c..d
+          return Interval.fromBoundary(
+            a.mul(c),
+            b.mul(d),
+            this.includesLeft && rhs.includesLeft,
+            this.includesRight && rhs.includesRight
+          );
+        } else if (d.isNegative) {
+          // 0 < a..b && c..d < 0
+          return Interval.fromBoundary(
+            b.mul(c),
+            a.mul(d),
+            this.includesRight && rhs.includesLeft,
+            this.includesLeft && rhs.includesRight
+          );
+        } else {
+          // 0 < a..b && 0 between c..d
+          return Interval.fromBoundary(
+            b.mul(c),
+            b.mul(d),
+            this.includesRight && rhs.includesLeft,
+            this.includesRight && rhs.includesRight
+          );
+        }
+      } else if (b.isNegative) {
+        if (c.isPositive) {
+          // a..b < 0 && 0 < c..d
+          return Interval.fromBoundary(
+            a.mul(d),
+            b.mul(c),
+            this.includesLeft && rhs.includesRight,
+            this.includesRight && rhs.includesLeft
+          );
+        } else if (d.isNegative) {
+          // a..b < 0 && c..d < 0
+          return Interval.fromBoundary(
+            b.mul(d),
+            a.mul(c),
+            this.includesRight && rhs.includesRight,
+            this.includesLeft && rhs.includesLeft
+          );
+        } else {
+          // a..b < 0 && 0 between c..d
+          return Interval.fromBoundary(
+            a.mul(d),
+            a.mul(c),
+            this.includesLeft && rhs.includesRight,
+            this.includesLeft && rhs.includesLeft
+          );
+        }
+      } else {
+        if (c.isPositive) {
+          // 0 between a..b && 0 < c..d
+          return Interval.fromBoundary(
+            a.mul(d),
+            b.mul(d),
+            this.includesLeft && rhs.includesRight,
+            this.includesRight && rhs.includesRight
+          );
+        } else if (d.isNegative) {
+          // 0 between a..b && c..d < 0
+          return Interval.fromBoundary(
+            b.mul(c),
+            a.mul(c),
+            this.includesRight && rhs.includesLeft,
+            this.includesLeft && rhs.includesLeft
+          );
+        } else {
+          // 0 between a..b && 0 between c..d
+          const ac = a.mul(c);
+          const ad = a.mul(d);
+          const bc = b.mul(c);
+          const bd = b.mul(d);
+          let left: Ratio, right: Ratio;
+          let includesLeft: boolean, includesRight: boolean;
+          if (ad.lt(bc)) {
+            left = ad;
+            includesLeft = this.includesLeft && rhs.includesRight;
+          } else if (bc.lt(ad)) {
+            left = bc;
+            includesLeft = this.includesRight && rhs.includesLeft;
+          } else {
+            left = ad;
+            includesLeft = (this.includesLeft && rhs.includesRight) || (this.includesRight && rhs.includesLeft);
+          }
+
+          if (ac.gt(bd)) {
+            right = ac;
+            includesRight = this.includesLeft && rhs.includesLeft;
+          } else if (bd.gt(ac)) {
+            right = bd;
+            includesRight = this.includesRight && rhs.includesRight;
+          } else {
+            right = ac;
+            includesRight = (this.includesLeft && rhs.includesLeft) || (this.includesRight && rhs.includesRight);
+          }
+          return Interval.fromBoundary(left, right, includesLeft, includesRight);
+        }
+      }
+    } else {
+      rhs = Ratio.from(rhs);
+      if (rhs.isNegative) {
+        return new Interval(this.center.mul(rhs), this.radius.mul(rhs.abs()), this.includesRight, this.includesLeft);
+      } else {
+        return new Interval(this.center.mul(rhs), this.radius.mul(rhs), this.includesLeft, this.includesRight);
+      }
+    }
+  }
 }
 
 export { Interval };
