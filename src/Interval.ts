@@ -139,6 +139,14 @@ class Interval {
   }
 
   /**
+   * この区間の正負を反転した区間を返します。
+   */
+  public neg(): Interval {
+    if (this.isEmpty) return this;
+    return new Interval(this.right.neg(), this.left.neg(), this.includesRight, this.includesLeft);
+  }
+
+  /**
    * この区間に指定した値または区間を加算します。
    * @param rhs 加算する値または区間
    */
