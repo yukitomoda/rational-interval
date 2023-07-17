@@ -164,6 +164,14 @@ class Interval {
       return this.changeBoundary(this.left.add(rhs), this.right.add(rhs));
     }
   }
+
+  public sub(rhs: Interval | ConvertableToRatio): Interval {
+    if (rhs instanceof Interval) {
+      return this.add(rhs.neg());
+    } else {
+      return this.add(Ratio.from(rhs).neg());
+    }
+  }
 }
 
 export { Interval };
