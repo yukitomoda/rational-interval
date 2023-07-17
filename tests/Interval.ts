@@ -220,6 +220,74 @@ describe('arithmetic', () => {
     assert.isTrue(Interval.empty.neg().eq(Interval.empty));
   });
 
+  describe('inv', () => {
+    it('not contains zero', () => {
+      assert.isTrue(
+        Interval.closed(ratio(1, 2), ratio(3, 4))
+          .inv()
+          .eq(Interval.closed(ratio(4, 3), ratio(2)))
+      );
+      assert.isTrue(
+        Interval.leftHalfOpen(ratio(1, 2), ratio(3, 4))
+          .inv()
+          .eq(Interval.rightHalfOpen(ratio(4, 3), ratio(2)))
+      );
+      assert.isTrue(
+        Interval.rightHalfOpen(ratio(1, 2), ratio(3, 4))
+          .inv()
+          .eq(Interval.leftHalfOpen(ratio(4, 3), ratio(2)))
+      );
+      assert.isTrue(
+        Interval.open(ratio(1, 2), ratio(3, 4))
+          .inv()
+          .eq(Interval.open(ratio(4, 3), ratio(2)))
+      );
+      assert.isTrue(Interval.empty.inv().eq(Interval.empty));
+    });
+
+    it('contains zero', () => {
+      assert.throws(() => {
+        Interval.point(0).inv();
+      });
+      assert.throws(() => {
+        Interval.closed(-1, 1).inv();
+      });
+      assert.throws(() => {
+        Interval.closed(-1, 0).inv();
+      });
+      assert.throws(() => {
+        Interval.closed(0, 1).inv();
+      });
+      assert.throws(() => {
+        Interval.leftHalfOpen(-1, 1).inv();
+      });
+      assert.throws(() => {
+        Interval.leftHalfOpen(-1, 0).inv();
+      });
+      assert.throws(() => {
+        Interval.leftHalfOpen(0, 1).inv();
+      });
+      assert.throws(() => {
+        Interval.rightHalfOpen(-1, 1).inv();
+      });
+      assert.throws(() => {
+        Interval.rightHalfOpen(-1, 0).inv();
+      });
+      assert.throws(() => {
+        Interval.rightHalfOpen(0, 1).inv();
+      });
+      assert.throws(() => {
+        Interval.open(-1, 1).inv();
+      });
+      assert.throws(() => {
+        Interval.open(-1, 0).inv();
+      });
+      assert.throws(() => {
+        Interval.open(0, 1).inv();
+      });
+    });
+  });
+
   describe('add', () => {
     it('Interval', () => {
       assert.isTrue(Interval.closed(-1, 2).add(Interval.closed(-3, 4)).eq(Interval.closed(-4, 6)));
