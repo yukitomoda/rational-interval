@@ -368,4 +368,331 @@ describe('arithmetic', () => {
       assert.isTrue(Interval.empty.sub(ratio(3)).eq(Interval.empty));
     });
   });
+
+  describe('mul', () => {
+    it('empty', () => {
+      assert.isTrue(Interval.closed(1, 2).mul(Interval.empty).isEmpty);
+      assert.isTrue(Interval.point(1).mul(Interval.empty).isEmpty);
+    });
+
+    it('Ratio', () => {
+      assert.isTrue(Interval.closed(1, 2).mul(ratio(2)).eq(Interval.closed(2, 4)));
+      assert.isTrue(Interval.closed(1, 2).mul(ratio(0)).eq(Interval.point(0)));
+      assert.isTrue(Interval.closed(1, 2).mul(ratio(-2)).eq(Interval.closed(-4, -2)));
+
+      assert.isTrue(Interval.leftHalfOpen(1, 2).mul(ratio(2)).eq(Interval.leftHalfOpen(2, 4)));
+      assert.isTrue(Interval.leftHalfOpen(1, 2).mul(ratio(0)).eq(Interval.empty));
+      assert.isTrue(Interval.leftHalfOpen(1, 2).mul(ratio(-2)).eq(Interval.rightHalfOpen(-4, -2)));
+
+      assert.isTrue(Interval.rightHalfOpen(1, 2).mul(ratio(2)).eq(Interval.rightHalfOpen(2, 4)));
+      assert.isTrue(Interval.rightHalfOpen(1, 2).mul(ratio(0)).eq(Interval.empty));
+      assert.isTrue(Interval.rightHalfOpen(1, 2).mul(ratio(-2)).eq(Interval.leftHalfOpen(-4, -2)));
+
+      assert.isTrue(Interval.open(1, 2).mul(ratio(2)).eq(Interval.open(2, 4)));
+      assert.isTrue(Interval.open(1, 2).mul(ratio(0)).eq(Interval.empty));
+      assert.isTrue(Interval.open(1, 2).mul(ratio(-2)).eq(Interval.open(-4, -2)));
+    });
+
+    describe('Interval', () => {
+      describe('this is empty', () => {
+        assert.isTrue(Interval.empty.mul(ratio(1)).isEmpty);
+        assert.isTrue(Interval.empty.mul(Interval.empty).isEmpty);
+        assert.isTrue(Interval.empty.mul(Interval.closed(-1, 1)).isEmpty);
+      });
+
+      describe('entire area of this is negative', () => {
+        it('entire area of rhs is negative', () => {
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.closed(-5, -4)).eq(Interval.closed(8, 15)));
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.rightHalfOpen(8, 15)));
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.leftHalfOpen(8, 15)));
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.open(-5, -4)).eq(Interval.open(8, 15)));
+
+          assert.isTrue(Interval.leftHalfOpen(-3, -2).mul(Interval.closed(-5, -4)).eq(Interval.rightHalfOpen(8, 15)));
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, -2).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.rightHalfOpen(8, 15))
+          );
+          assert.isTrue(Interval.leftHalfOpen(-3, -2).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.open(8, 15)));
+          assert.isTrue(Interval.leftHalfOpen(-3, -2).mul(Interval.open(-5, -4)).eq(Interval.open(8, 15)));
+
+          assert.isTrue(Interval.rightHalfOpen(-3, -2).mul(Interval.closed(-5, -4)).eq(Interval.leftHalfOpen(8, 15)));
+          assert.isTrue(Interval.rightHalfOpen(-3, -2).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.open(8, 15)));
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.leftHalfOpen(8, 15))
+          );
+          assert.isTrue(Interval.rightHalfOpen(-3, -2).mul(Interval.open(-5, -4)).eq(Interval.open(8, 15)));
+
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.closed(-5, -4)).eq(Interval.open(8, 15)));
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.open(8, 15)));
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.open(8, 15)));
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.open(-5, -4)).eq(Interval.open(8, 15)));
+        });
+
+        it('rhs contains zero', () => {
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.closed(-5, 4)).eq(Interval.closed(-12, 15)));
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.rightHalfOpen(-12, 15)));
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.leftHalfOpen(-12, 15)));
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.open(-5, 4)).eq(Interval.open(-12, 15)));
+
+          assert.isTrue(Interval.leftHalfOpen(-3, -2).mul(Interval.closed(-5, 4)).eq(Interval.open(-12, 15)));
+          assert.isTrue(Interval.leftHalfOpen(-3, -2).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.open(-12, 15)));
+          assert.isTrue(Interval.leftHalfOpen(-3, -2).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.open(-12, 15)));
+          assert.isTrue(Interval.leftHalfOpen(-3, -2).mul(Interval.open(-5, 4)).eq(Interval.open(-12, 15)));
+
+          assert.isTrue(Interval.rightHalfOpen(-3, -2).mul(Interval.closed(-5, 4)).eq(Interval.closed(-12, 15)));
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.rightHalfOpen(-12, 15))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.leftHalfOpen(-12, 15))
+          );
+          assert.isTrue(Interval.rightHalfOpen(-3, -2).mul(Interval.open(-5, 4)).eq(Interval.open(-12, 15)));
+
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.closed(-5, 4)).eq(Interval.open(-12, 15)));
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.open(-12, 15)));
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.open(-12, 15)));
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.open(-5, 4)).eq(Interval.open(-12, 15)));
+        });
+
+        it('entire area of rhs is positive', () => {
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.closed(4, 5)).eq(Interval.closed(-15, -8)));
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.rightHalfOpen(-15, -8)));
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.leftHalfOpen(-15, -8)));
+          assert.isTrue(Interval.closed(-3, -2).mul(Interval.open(4, 5)).eq(Interval.open(-15, -8)));
+
+          assert.isTrue(Interval.leftHalfOpen(-3, -2).mul(Interval.closed(4, 5)).eq(Interval.leftHalfOpen(-15, -8)));
+          assert.isTrue(Interval.leftHalfOpen(-3, -2).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.open(-15, -8)));
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, -2).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.leftHalfOpen(-15, -8))
+          );
+          assert.isTrue(Interval.leftHalfOpen(-3, -2).mul(Interval.open(4, 5)).eq(Interval.open(-15, -8)));
+
+          assert.isTrue(Interval.rightHalfOpen(-3, -2).mul(Interval.closed(4, 5)).eq(Interval.rightHalfOpen(-15, -8)));
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.rightHalfOpen(-15, -8))
+          );
+          assert.isTrue(Interval.rightHalfOpen(-3, -2).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.open(-15, -8)));
+          assert.isTrue(Interval.rightHalfOpen(-3, -2).mul(Interval.open(4, 5)).eq(Interval.open(-15, -8)));
+
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.closed(4, 5)).eq(Interval.open(-15, -8)));
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.open(-15, -8)));
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.open(-15, -8)));
+          assert.isTrue(Interval.open(-3, -2).mul(Interval.open(4, 5)).eq(Interval.open(-15, -8)));
+        });
+      });
+
+      describe('this contains zero', () => {
+        it('entire area of rhs is negative', () => {
+          assert.isTrue(Interval.closed(-2, 3).mul(Interval.closed(-5, -4)).eq(Interval.closed(-15, 10)));
+          assert.isTrue(Interval.closed(-2, 3).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.open(-15, 10)));
+          assert.isTrue(Interval.closed(-2, 3).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.closed(-15, 10)));
+          assert.isTrue(Interval.closed(-2, 3).mul(Interval.open(-5, -4)).eq(Interval.open(-15, 10)));
+
+          assert.isTrue(Interval.leftHalfOpen(-2, 3).mul(Interval.closed(-5, -4)).eq(Interval.rightHalfOpen(-15, 10)));
+          assert.isTrue(Interval.leftHalfOpen(-2, 3).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.open(-15, 10)));
+          assert.isTrue(
+            Interval.leftHalfOpen(-2, 3).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.rightHalfOpen(-15, 10))
+          );
+          assert.isTrue(Interval.leftHalfOpen(-2, 3).mul(Interval.open(-5, -4)).eq(Interval.open(-15, 10)));
+
+          assert.isTrue(Interval.rightHalfOpen(-2, 3).mul(Interval.closed(-5, -4)).eq(Interval.leftHalfOpen(-15, 10)));
+          assert.isTrue(Interval.rightHalfOpen(-2, 3).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.open(-15, 10)));
+          assert.isTrue(
+            Interval.rightHalfOpen(-2, 3).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.leftHalfOpen(-15, 10))
+          );
+          assert.isTrue(Interval.rightHalfOpen(-2, 3).mul(Interval.open(-5, -4)).eq(Interval.open(-15, 10)));
+
+          assert.isTrue(Interval.open(-2, 3).mul(Interval.closed(-5, -4)).eq(Interval.open(-15, 10)));
+          assert.isTrue(Interval.open(-2, 3).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.open(-15, 10)));
+          assert.isTrue(Interval.open(-2, 3).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.open(-15, 10)));
+          assert.isTrue(Interval.open(-2, 3).mul(Interval.open(-5, -4)).eq(Interval.open(-15, 10)));
+        });
+
+        it('rhs contains zero_1', () => {
+          assert.isTrue(Interval.closed(-2, 3).mul(Interval.closed(-5, 4)).eq(Interval.closed(-15, 12)));
+          assert.isTrue(Interval.closed(-2, 3).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.leftHalfOpen(-15, 12)));
+          assert.isTrue(Interval.closed(-2, 3).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.rightHalfOpen(-15, 12)));
+          assert.isTrue(Interval.closed(-2, 3).mul(Interval.open(-5, 4)).eq(Interval.open(-15, 12)));
+
+          assert.isTrue(Interval.leftHalfOpen(-2, 3).mul(Interval.closed(-5, 4)).eq(Interval.closed(-15, 12)));
+          assert.isTrue(
+            Interval.leftHalfOpen(-2, 3).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.leftHalfOpen(-15, 12))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-2, 3).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.rightHalfOpen(-15, 12))
+          );
+          assert.isTrue(Interval.leftHalfOpen(-2, 3).mul(Interval.open(-5, 4)).eq(Interval.open(-15, 12)));
+
+          assert.isTrue(Interval.rightHalfOpen(-2, 3).mul(Interval.closed(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.rightHalfOpen(-2, 3).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.rightHalfOpen(-2, 3).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.rightHalfOpen(-2, 3).mul(Interval.open(-5, 4)).eq(Interval.open(-15, 12)));
+
+          assert.isTrue(Interval.open(-2, 3).mul(Interval.closed(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.open(-2, 3).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.open(-2, 3).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.open(-2, 3).mul(Interval.open(-5, 4)).eq(Interval.open(-15, 12)));
+        });
+
+        it('rhs contains zero_2', () => {
+          assert.isTrue(Interval.closed(-6, 7).mul(Interval.closed(-5, 4)).eq(Interval.closed(-35, 30)));
+          assert.isTrue(Interval.closed(-6, 7).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.open(-35, 30)));
+          assert.isTrue(Interval.closed(-6, 7).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.closed(-35, 30)));
+          assert.isTrue(Interval.closed(-6, 7).mul(Interval.open(-5, 4)).eq(Interval.open(-35, 30)));
+
+          assert.isTrue(Interval.leftHalfOpen(-6, 7).mul(Interval.closed(-5, 4)).eq(Interval.rightHalfOpen(-35, 30)));
+          assert.isTrue(Interval.leftHalfOpen(-6, 7).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.open(-35, 30)));
+          assert.isTrue(
+            Interval.leftHalfOpen(-6, 7).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.rightHalfOpen(-35, 30))
+          );
+          assert.isTrue(Interval.leftHalfOpen(-6, 7).mul(Interval.open(-5, 4)).eq(Interval.open(-35, 30)));
+
+          assert.isTrue(Interval.rightHalfOpen(-6, 7).mul(Interval.closed(-5, 4)).eq(Interval.leftHalfOpen(-35, 30)));
+          assert.isTrue(Interval.rightHalfOpen(-6, 7).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.open(-35, 30)));
+          assert.isTrue(
+            Interval.rightHalfOpen(-6, 7).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.leftHalfOpen(-35, 30))
+          );
+          assert.isTrue(Interval.rightHalfOpen(-6, 7).mul(Interval.open(-5, 4)).eq(Interval.open(-35, 30)));
+
+          assert.isTrue(Interval.open(-6, 7).mul(Interval.closed(-5, 4)).eq(Interval.open(-35, 30)));
+          assert.isTrue(Interval.open(-6, 7).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.open(-35, 30)));
+          assert.isTrue(Interval.open(-6, 7).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.open(-35, 30)));
+          assert.isTrue(Interval.open(-6, 7).mul(Interval.open(-5, 4)).eq(Interval.open(-35, 30)));
+        });
+
+        it('rhs contains zero_3', () => {
+          assert.isTrue(Interval.closed(-2, 2).mul(Interval.closed(-2, 2)).eq(Interval.closed(-4, 4)));
+          assert.isTrue(Interval.closed(-2, 2).mul(Interval.leftHalfOpen(-2, 2)).eq(Interval.closed(-4, 4)));
+          assert.isTrue(Interval.closed(-2, 2).mul(Interval.rightHalfOpen(-2, 2)).eq(Interval.closed(-4, 4)));
+          assert.isTrue(Interval.closed(-2, 2).mul(Interval.open(-2, 2)).eq(Interval.open(-4, 4)));
+
+          assert.isTrue(Interval.leftHalfOpen(-2, 2).mul(Interval.closed(-2, 2)).eq(Interval.closed(-4, 4)));
+          assert.isTrue(
+            Interval.leftHalfOpen(-2, 2).mul(Interval.leftHalfOpen(-2, 2)).eq(Interval.leftHalfOpen(-4, 4))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-2, 2).mul(Interval.rightHalfOpen(-2, 2)).eq(Interval.rightHalfOpen(-4, 4))
+          );
+          assert.isTrue(Interval.leftHalfOpen(-2, 2).mul(Interval.open(-2, 2)).eq(Interval.open(-4, 4)));
+
+          assert.isTrue(Interval.rightHalfOpen(-2, 2).mul(Interval.closed(-2, 2)).eq(Interval.closed(-4, 4)));
+          assert.isTrue(
+            Interval.rightHalfOpen(-2, 2).mul(Interval.leftHalfOpen(-2, 2)).eq(Interval.rightHalfOpen(-4, 4))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-2, 2).mul(Interval.rightHalfOpen(-2, 2)).eq(Interval.leftHalfOpen(-4, 4))
+          );
+          assert.isTrue(Interval.rightHalfOpen(-2, 2).mul(Interval.open(-2, 2)).eq(Interval.open(-4, 4)));
+
+          assert.isTrue(Interval.open(-2, 2).mul(Interval.closed(-2, 2)).eq(Interval.open(-4, 4)));
+          assert.isTrue(Interval.open(-2, 2).mul(Interval.leftHalfOpen(-2, 2)).eq(Interval.open(-4, 4)));
+          assert.isTrue(Interval.open(-2, 2).mul(Interval.rightHalfOpen(-2, 2)).eq(Interval.open(-4, 4)));
+          assert.isTrue(Interval.open(-2, 2).mul(Interval.open(-2, 2)).eq(Interval.open(-4, 4)));
+        });
+
+        it('entire area of rhs is positive', () => {
+          assert.isTrue(Interval.closed(-3, 2).mul(Interval.closed(4, 5)).eq(Interval.closed(-15, 10)));
+          assert.isTrue(Interval.closed(-3, 2).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.closed(-15, 10)));
+          assert.isTrue(Interval.closed(-3, 2).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.open(-15, 10)));
+          assert.isTrue(Interval.closed(-3, 2).mul(Interval.open(4, 5)).eq(Interval.open(-15, 10)));
+
+          assert.isTrue(Interval.leftHalfOpen(-3, 2).mul(Interval.closed(4, 5)).eq(Interval.leftHalfOpen(-15, 10)));
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, 2).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.leftHalfOpen(-15, 10))
+          );
+          assert.isTrue(Interval.leftHalfOpen(-3, 2).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.open(-15, 10)));
+          assert.isTrue(Interval.leftHalfOpen(-3, 2).mul(Interval.open(4, 5)).eq(Interval.open(-15, 10)));
+
+          assert.isTrue(Interval.rightHalfOpen(-3, 2).mul(Interval.closed(4, 5)).eq(Interval.rightHalfOpen(-15, 10)));
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, 2).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.rightHalfOpen(-15, 10))
+          );
+          assert.isTrue(Interval.rightHalfOpen(-3, 2).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.open(-15, 10)));
+          assert.isTrue(Interval.rightHalfOpen(-3, 2).mul(Interval.open(4, 5)).eq(Interval.open(-15, 10)));
+
+          assert.isTrue(Interval.open(-3, 2).mul(Interval.closed(4, 5)).eq(Interval.open(-15, 10)));
+          assert.isTrue(Interval.open(-3, 2).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.open(-15, 10)));
+          assert.isTrue(Interval.open(-3, 2).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.open(-15, 10)));
+          assert.isTrue(Interval.open(-3, 2).mul(Interval.open(4, 5)).eq(Interval.open(-15, 10)));
+        });
+      });
+
+      describe('entire area of this is positive', () => {
+        it('entire area of rhs is negative', () => {
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.closed(-5, -4)).eq(Interval.closed(-15, -8)));
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.leftHalfOpen(-15, -8)));
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.rightHalfOpen(-15, -8)));
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.open(-5, -4)).eq(Interval.open(-15, -8)));
+
+          assert.isTrue(Interval.leftHalfOpen(2, 3).mul(Interval.closed(-5, -4)).eq(Interval.rightHalfOpen(-15, -8)));
+          assert.isTrue(Interval.leftHalfOpen(2, 3).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.open(-15, -8)));
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.rightHalfOpen(-15, -8))
+          );
+          assert.isTrue(Interval.leftHalfOpen(2, 3).mul(Interval.open(-5, -4)).eq(Interval.open(-15, -8)));
+
+          assert.isTrue(Interval.rightHalfOpen(2, 3).mul(Interval.closed(-5, -4)).eq(Interval.leftHalfOpen(-15, -8)));
+          assert.isTrue(
+            Interval.rightHalfOpen(2, 3).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.leftHalfOpen(-15, -8))
+          );
+          assert.isTrue(Interval.rightHalfOpen(2, 3).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.open(-15, -8)));
+          assert.isTrue(Interval.rightHalfOpen(2, 3).mul(Interval.open(-5, -4)).eq(Interval.open(-15, -8)));
+
+          assert.isTrue(Interval.open(2, 3).mul(Interval.closed(-5, -4)).eq(Interval.open(-15, -8)));
+          assert.isTrue(Interval.open(2, 3).mul(Interval.leftHalfOpen(-5, -4)).eq(Interval.open(-15, -8)));
+          assert.isTrue(Interval.open(2, 3).mul(Interval.rightHalfOpen(-5, -4)).eq(Interval.open(-15, -8)));
+          assert.isTrue(Interval.open(2, 3).mul(Interval.open(-5, -4)).eq(Interval.open(-15, -8)));
+        });
+
+        it('rhs contains zero', () => {
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.closed(-5, 4)).eq(Interval.closed(-15, 12)));
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.leftHalfOpen(-15, 12)));
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.rightHalfOpen(-15, 12)));
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.open(-5, 4)).eq(Interval.open(-15, 12)));
+
+          assert.isTrue(Interval.leftHalfOpen(2, 3).mul(Interval.closed(-5, 4)).eq(Interval.closed(-15, 12)));
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.leftHalfOpen(-15, 12))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.rightHalfOpen(-15, 12))
+          );
+          assert.isTrue(Interval.leftHalfOpen(2, 3).mul(Interval.open(-5, 4)).eq(Interval.open(-15, 12)));
+
+          assert.isTrue(Interval.rightHalfOpen(2, 3).mul(Interval.closed(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.rightHalfOpen(2, 3).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.rightHalfOpen(2, 3).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.rightHalfOpen(2, 3).mul(Interval.open(-5, 4)).eq(Interval.open(-15, 12)));
+
+          assert.isTrue(Interval.open(2, 3).mul(Interval.closed(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.open(2, 3).mul(Interval.leftHalfOpen(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.open(2, 3).mul(Interval.rightHalfOpen(-5, 4)).eq(Interval.open(-15, 12)));
+          assert.isTrue(Interval.open(2, 3).mul(Interval.open(-5, 4)).eq(Interval.open(-15, 12)));
+        });
+
+        it('entire area of rhs is positive', () => {
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.closed(4, 5)).eq(Interval.closed(8, 15)));
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.leftHalfOpen(8, 15)));
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.rightHalfOpen(8, 15)));
+          assert.isTrue(Interval.closed(2, 3).mul(Interval.open(4, 5)).eq(Interval.open(8, 15)));
+
+          assert.isTrue(Interval.leftHalfOpen(2, 3).mul(Interval.closed(4, 5)).eq(Interval.leftHalfOpen(8, 15)));
+          assert.isTrue(Interval.leftHalfOpen(2, 3).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.leftHalfOpen(8, 15)));
+          assert.isTrue(Interval.leftHalfOpen(2, 3).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.open(8, 15)));
+          assert.isTrue(Interval.leftHalfOpen(2, 3).mul(Interval.open(4, 5)).eq(Interval.open(8, 15)));
+
+          assert.isTrue(Interval.rightHalfOpen(2, 3).mul(Interval.closed(4, 5)).eq(Interval.rightHalfOpen(8, 15)));
+          assert.isTrue(Interval.rightHalfOpen(2, 3).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.open(8, 15)));
+          assert.isTrue(
+            Interval.rightHalfOpen(2, 3).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.rightHalfOpen(8, 15))
+          );
+          assert.isTrue(Interval.rightHalfOpen(2, 3).mul(Interval.open(4, 5)).eq(Interval.open(8, 15)));
+
+          assert.isTrue(Interval.open(2, 3).mul(Interval.closed(4, 5)).eq(Interval.open(8, 15)));
+          assert.isTrue(Interval.open(2, 3).mul(Interval.leftHalfOpen(4, 5)).eq(Interval.open(8, 15)));
+          assert.isTrue(Interval.open(2, 3).mul(Interval.rightHalfOpen(4, 5)).eq(Interval.open(8, 15)));
+          assert.isTrue(Interval.open(2, 3).mul(Interval.open(4, 5)).eq(Interval.open(8, 15)));
+        });
+      });
+    });
+  });
 });
