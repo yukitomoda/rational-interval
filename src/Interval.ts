@@ -347,6 +347,22 @@ class Interval {
       }
     }
   }
+
+  /**
+   * この区間を指定した値または区間で割ります。
+   * @param rhs 割る値または区間。この値は0であってはならず、区間の場合は0が含まれていてはなりません。
+   */
+  public div(rhs: Interval | ConvertableToRatio): Interval {
+    if (this.isEmpty) return this;
+    if (rhs instanceof Interval) {
+      if (rhs.isEmpty) return rhs;
+      if (rhs.contains(Ratio.from(0))) throw new Error('rhs must not contain zero.');
+      return this.mul(rhs.inv());
+    } else {
+      rhs = Ratio.from(rhs);
+      return this.mul(rhs.inv());
+    }
+  }
 }
 
 export { Interval };

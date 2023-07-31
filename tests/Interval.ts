@@ -695,4 +695,601 @@ describe('arithmetic', () => {
       });
     });
   });
+
+  describe('div', () => {
+    it('empty', () => {
+      assert.isTrue(Interval.closed(1, 2).div(Interval.empty).isEmpty);
+      assert.isTrue(Interval.point(1).div(Interval.empty).isEmpty);
+    });
+
+    it('Ratio', () => {
+      assert.isTrue(
+        Interval.closed(1, 2)
+          .div(ratio(2))
+          .eq(Interval.closed(ratio(1, 2), 1))
+      );
+      assert.isTrue(
+        Interval.closed(1, 2)
+          .div(ratio(-2))
+          .eq(Interval.closed(-1, ratio(-1, 2)))
+      );
+
+      assert.isTrue(
+        Interval.leftHalfOpen(1, 2)
+          .div(ratio(2))
+          .eq(Interval.leftHalfOpen(ratio(1, 2), 1))
+      );
+      assert.isTrue(
+        Interval.leftHalfOpen(1, 2)
+          .div(ratio(-2))
+          .eq(Interval.rightHalfOpen(-1, ratio(-1, 2)))
+      );
+
+      assert.isTrue(
+        Interval.rightHalfOpen(1, 2)
+          .div(ratio(2))
+          .eq(Interval.rightHalfOpen(ratio(1, 2), 1))
+      );
+      assert.isTrue(
+        Interval.rightHalfOpen(1, 2)
+          .div(ratio(-2))
+          .eq(Interval.leftHalfOpen(-1, ratio(-1, 2)))
+      );
+
+      assert.isTrue(
+        Interval.open(1, 2)
+          .div(ratio(2))
+          .eq(Interval.open(ratio(1, 2), 1))
+      );
+      assert.isTrue(
+        Interval.open(1, 2)
+          .div(ratio(-2))
+          .eq(Interval.open(-1, ratio(-1, 2)))
+      );
+    });
+
+    describe('Interval', () => {
+      describe('this is empty', () => {
+        assert.isTrue(Interval.empty.div(ratio(1)).isEmpty);
+        assert.isTrue(Interval.empty.div(Interval.empty).isEmpty);
+        assert.isTrue(Interval.empty.div(Interval.closed(-1, 1)).isEmpty);
+      });
+
+      describe('entire area of this is negative', () => {
+        it('entire area of rhs is negative', () => {
+          assert.isTrue(
+            Interval.closed(-3, -2)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.closed(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(-3, -2)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.leftHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(-3, -2)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.rightHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(-3, -2)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, -2)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.rightHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, -2)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, -2)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.rightHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, -2)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.leftHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.leftHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+
+          assert.isTrue(
+            Interval.open(-3, -2)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.open(-3, -2)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.open(-3, -2)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.open(-3, -2)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+        });
+
+        it('rhs contains zero', () => {
+          assert.throw(() => Interval.closed(-3, -2).div(Interval.closed(0, 4)));
+          assert.throw(() => Interval.closed(-3, -2).div(Interval.closed(-5, 4)));
+          assert.throw(() => Interval.closed(-3, -2).div(Interval.closed(-5, 0)));
+        });
+
+        it('entire area of rhs is positive', () => {
+          assert.isTrue(
+            Interval.closed(-3, -2)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.closed(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.closed(-3, -2)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.leftHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.closed(-3, -2)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.rightHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.closed(-3, -2)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, -2)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.leftHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, -2)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.leftHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, -2)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, -2)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.rightHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.rightHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, -2)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+
+          assert.isTrue(
+            Interval.open(-3, -2)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.open(-3, -2)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.open(-3, -2)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.open(-3, -2)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+        });
+      });
+
+      describe('this contains zero', () => {
+        it('entire area of rhs is negative', () => {
+          assert.isTrue(
+            Interval.closed(-2, 3)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.closed(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(-2, 3)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.closed(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(-2, 3)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(-2, 3)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(3, -4), ratio(2, 4)))
+          );
+
+          assert.isTrue(
+            Interval.leftHalfOpen(-2, 3)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.rightHalfOpen(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-2, 3)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.rightHalfOpen(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-2, 3)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-2, 3)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(3, -4), ratio(2, 4)))
+          );
+
+          assert.isTrue(
+            Interval.rightHalfOpen(-2, 3)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.leftHalfOpen(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-2, 3)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.leftHalfOpen(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-2, 3)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-2, 3)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(3, -4), ratio(2, 4)))
+          );
+
+          assert.isTrue(
+            Interval.open(-2, 3)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.open(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.open(-2, 3)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.open(-2, 3)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(3, -4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.open(-2, 3)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(3, -4), ratio(2, 4)))
+          );
+        });
+
+        it('rhs contains zero', () => {
+          assert.throw(() => Interval.closed(-2, 2).div(Interval.closed(-2, 2)));
+        });
+
+        it('entire area of rhs is positive', () => {
+          assert.isTrue(
+            Interval.closed(-3, 2)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.closed(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(-3, 2)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(-3, 2)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.closed(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(-3, 2)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, 2)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.leftHalfOpen(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, 2)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, 2)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(-3, 2)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, 2)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.rightHalfOpen(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, 2)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, 2)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.rightHalfOpen(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(-3, 2)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+
+          assert.isTrue(
+            Interval.open(-3, 2)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.open(-3, 2)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.open(-3, 2)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+          assert.isTrue(
+            Interval.open(-3, 2)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(-3, 4), ratio(2, 4)))
+          );
+        });
+      });
+
+      describe('entire area of this is positive', () => {
+        it('entire area of rhs is negative', () => {
+          assert.isTrue(
+            Interval.closed(2, 3)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.closed(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.closed(2, 3)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.rightHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.closed(2, 3)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.leftHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.closed(2, 3)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.rightHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.rightHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+
+          assert.isTrue(
+            Interval.rightHalfOpen(2, 3)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.leftHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(2, 3)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(2, 3)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.leftHalfOpen(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(2, 3)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+
+          assert.isTrue(
+            Interval.open(2, 3)
+              .div(Interval.closed(-5, -4))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.open(2, 3)
+              .div(Interval.leftHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.open(2, 3)
+              .div(Interval.rightHalfOpen(-5, -4))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+          assert.isTrue(
+            Interval.open(2, 3)
+              .div(Interval.open(-5, -4))
+              .eq(Interval.open(ratio(-3, 4), ratio(-2, 5)))
+          );
+        });
+
+        it('rhs contains zero', () => {
+          assert.throw(() => Interval.closed(2, 3).div(Interval.closed(-5, 4)));
+        });
+
+        it('entire area of rhs is positive', () => {
+          assert.isTrue(
+            Interval.closed(2, 3)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.closed(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(2, 3)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.rightHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(2, 3)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.leftHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.closed(2, 3)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.leftHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.leftHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.leftHalfOpen(2, 3)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+
+          assert.isTrue(
+            Interval.rightHalfOpen(2, 3)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.rightHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(2, 3)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.rightHalfOpen(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(2, 3)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.rightHalfOpen(2, 3)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+
+          assert.isTrue(
+            Interval.open(2, 3)
+              .div(Interval.closed(4, 5))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.open(2, 3)
+              .div(Interval.leftHalfOpen(4, 5))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.open(2, 3)
+              .div(Interval.rightHalfOpen(4, 5))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+          assert.isTrue(
+            Interval.open(2, 3)
+              .div(Interval.open(4, 5))
+              .eq(Interval.open(ratio(2, 5), ratio(3, 4)))
+          );
+        });
+      });
+    });
+  });
 });
